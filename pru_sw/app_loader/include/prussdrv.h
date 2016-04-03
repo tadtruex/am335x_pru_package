@@ -118,7 +118,8 @@ extern "C" {
     /** Return string description of PRU version. */
     const char* prussdrv_strversion(int version);
 
-  unsigned int prussdrv_pru_set_control( unsigned int prunum, unsigned int newVal );
+  unsigned int prussdrv_pru_set_control( unsigned int prunum, unsigned int  newVal );
+  unsigned int prussdrv_pru_get_control( unsigned int prunum, unsigned int *oldVal );
 
     int prussdrv_pru_reset(unsigned int prunum);
 
@@ -191,11 +192,16 @@ extern "C" {
 
     int prussdrv_exit(void);
 
+    int prussdrv_load_program(int prunum, const char *filename);
+    int prussdrv_load_program_at(int prunum, const char *filename, size_t addr);
+    int prussdrv_load_code(int prunum, const unsigned int *code, int codelen);
+    int prussdrv_load_code_at(int prunum, const unsigned int *code, int codelen, size_t addr);
+
     int prussdrv_exec_program(int prunum, const char *filename);
     int prussdrv_exec_program_at(int prunum, const char *filename, size_t addr);
-
     int prussdrv_exec_code(int prunum, const unsigned int *code, int codelen);
     int prussdrv_exec_code_at(int prunum, const unsigned int *code, int codelen, size_t addr);
+
     int prussdrv_load_data(int prunum, const unsigned int *code, int codelen);
     int prussdrv_load_datafile(int prunum, const char *filename);
 

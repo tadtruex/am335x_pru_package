@@ -283,21 +283,12 @@ const char * prussdrv_strversion(int version) {
 
 int prussdrv_pru_reset(unsigned int prunum)
 {
-    unsigned int *prucontrolregs;
-    if (prunum == 0)
-        prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
-    else if (prunum == 1)
-        prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
-    else
-        return -1;
-    *prucontrolregs = 0;
-    return 0;
+  return prussdrv_pru_set_control( prunum, 0 );
 }
 
-unsigned int prussdrv_pru_get_control(unsigned int prunum)
+unsigned int prussdrv_pru_get_control(unsigned int prunum, unsigned int *oldVal)
 {
     unsigned int *prucontrolregs;
-    unsigned int oldVal;
 
     if (prunum == 0)
         prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
@@ -305,15 +296,14 @@ unsigned int prussdrv_pru_get_control(unsigned int prunum)
         prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
     else
         return -1;
-    oldVal = *prucontrolregs;
+    *oldVal = *prucontrolregs;
 
-    return oldVal;
+    return 0;
 }
 
 unsigned int prussdrv_pru_set_control(unsigned int prunum, unsigned int newVal)
 {
     unsigned int *prucontrolregs;
-    unsigned int oldVal = prussdrv_pru_get_control( prunum );
 
     if (prunum == 0)
         prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
@@ -321,10 +311,9 @@ unsigned int prussdrv_pru_set_control(unsigned int prunum, unsigned int newVal)
         prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
     else
         return -1;
-    oldVal = *prucontrolregs;
 
     *prucontrolregs = newVal;
-    return oldVal;
+    return 0;
 }
 
 int prussdrv_pru_enable(unsigned int prunum)
@@ -336,9 +325,6 @@ int prussdrv_pru_enable_at(unsigned int prunum, size_t addr)
 {
   unsigned int newVal = ((uint32_t)(addr / sizeof(uint32_t)) << 16) | 2 ;
   return prussdrv_pru_set_control(prunum, newVal );
-
-    return 0;
-
 }
 
 int prussdrv_pru_disable(unsigned int prunum)
@@ -682,12 +668,31 @@ int prussdrv_exit()
     return 0;
 }
 
-int prussdrv_exec_program(int prunum, const char *filename)
-{
-  return prussdrv_exec_program_at(prunum, filename, 0);
+
+int prussdrv_exec_program(int prunum, const char *filename) {
+  return prussdrv_load_program(prunum, filename );
 }
 
-int prussdrv_exec_program_at(int prunum, const char *filename, size_t addr)
+int prussdrv_exec_program_at(int prunum, const char *filename, size_t addr){
+  return prussdrv_load_program_at( prunum, filename, addr );
+}
+
+int prussdrv_exec_code(int prunum, const unsigned int *code, int codelen){
+  return prussdrv_load_code( prunum, code, codelen );
+}
+
+int prussdrv_exec_code_at(int prunum, const unsigned int *code, int codelen, size_t addr){
+  return prussdrv_exec_code_at(prunum, code, codelen, addr );
+}
+
+
+
+int prussdrv_load_program(int prunum, const char *filename)
+{
+  return prussdrv_load_program_at(prunum, filename, 0);
+}
+
+int prussdrv_load_program_at(int prunum, const char *filename, size_t addr)
 {
     FILE *fPtr;
     unsigned char fileDataArray[PRUSS_MAX_IRAM_SIZE];
@@ -722,15 +727,15 @@ int prussdrv_exec_program_at(int prunum, const char *filename, size_t addr)
 
     fclose(fPtr);
 
-    return prussdrv_exec_code_at(prunum, (const unsigned int *) fileDataArray, fileSize, addr);
+    return prussdrv_load_code_at(prunum, (const unsigned int *) fileDataArray, fileSize, addr);
 }
 
-int prussdrv_exec_code(int prunum, const unsigned int *code, int codelen)
+int prussdrv_load_code(int prunum, const unsigned int *code, int codelen)
 {
-  return prussdrv_exec_code_at(prunum, code, codelen, 0);
+  return prussdrv_load_code_at(prunum, code, codelen, 0);
 }
 
-int prussdrv_exec_code_at(int prunum, const unsigned int *code, int codelen, size_t addr)
+int prussdrv_load_code_at(int prunum, const unsigned int *code, int codelen, size_t addr)
 {
     unsigned int pru_ram_id;
 
