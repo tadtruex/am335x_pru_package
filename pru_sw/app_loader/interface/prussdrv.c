@@ -280,6 +280,7 @@ const char * prussdrv_strversion(int version) {
     }
 }
 
+
 int prussdrv_pru_reset(unsigned int prunum)
 {
     unsigned int *prucontrolregs;
@@ -293,6 +294,39 @@ int prussdrv_pru_reset(unsigned int prunum)
     return 0;
 }
 
+unsigned int prussdrv_pru_get_control(unsigned int prunum)
+{
+    unsigned int *prucontrolregs;
+    unsigned int oldVal;
+
+    if (prunum == 0)
+        prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
+    else if (prunum == 1)
+        prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
+    else
+        return -1;
+    oldVal = *prucontrolregs;
+
+    return oldVal;
+}
+
+unsigned int prussdrv_pru_set_control(unsigned int prunum, unsigned int newVal)
+{
+    unsigned int *prucontrolregs;
+    unsigned int oldVal = prussdrv_pru_get_control( prunum );
+
+    if (prunum == 0)
+        prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
+    else if (prunum == 1)
+        prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
+    else
+        return -1;
+    oldVal = *prucontrolregs;
+
+    *prucontrolregs = newVal;
+    return oldVal;
+}
+
 int prussdrv_pru_enable(unsigned int prunum)
 {
   return prussdrv_pru_enable_at(prunum, 0);
@@ -300,16 +334,8 @@ int prussdrv_pru_enable(unsigned int prunum)
 
 int prussdrv_pru_enable_at(unsigned int prunum, size_t addr)
 {
-    volatile uint32_t* prucontrolregs;
-    if (prunum == 0)
-        prucontrolregs = (volatile uint32_t *) prussdrv.pru0_control_base;
-    else if (prunum == 1)
-        prucontrolregs = (volatile uint32_t *) prussdrv.pru1_control_base;
-    else
-        return -1;
-
-    /* address is in bytes and must be converted in 32 bits words */
-    *prucontrolregs = ((uint32_t)(addr / sizeof(uint32_t)) << 16) | 2;
+  unsigned int newVal = ((uint32_t)(addr / sizeof(uint32_t)) << 16) | 2 ;
+  return prussdrv_pru_set_control(prunum, newVal );
 
     return 0;
 
@@ -317,16 +343,7 @@ int prussdrv_pru_enable_at(unsigned int prunum, size_t addr)
 
 int prussdrv_pru_disable(unsigned int prunum)
 {
-    unsigned int *prucontrolregs;
-    if (prunum == 0)
-        prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
-    else if (prunum == 1)
-        prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
-    else
-        return -1;
-    *prucontrolregs = 1;
-    return 0;
-
+  return prussdrv_pru_set_control( prunum, 1 );
 }
 
 int prussdrv_pru_write_memory(unsigned int pru_ram_id,

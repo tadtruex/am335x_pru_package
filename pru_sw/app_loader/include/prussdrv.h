@@ -118,6 +118,8 @@ extern "C" {
     /** Return string description of PRU version. */
     const char* prussdrv_strversion(int version);
 
+  unsigned int prussdrv_pru_set_control( unsigned int prunum, unsigned int newVal );
+
     int prussdrv_pru_reset(unsigned int prunum);
 
     int prussdrv_pru_disable(unsigned int prunum);
