@@ -170,6 +170,9 @@ extern "C" {
 
     int prussdrv_map_peripheral_io(unsigned int per_id, void **address);
 
+  unsigned int *prussdrv_pru_get_control_addr( unsigned int prunum );
+  unsigned int *prussdrv_pru_get_debug_addr( unsigned int prunum );
+
     unsigned int prussdrv_get_phys_addr(const void *address);
 
     void *prussdrv_get_virt_addr(unsigned int phyaddr);

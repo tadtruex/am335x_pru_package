@@ -301,6 +301,32 @@ unsigned int prussdrv_pru_get_control(unsigned int prunum, unsigned int *oldVal)
     return 0;
 }
 
+unsigned int *prussdrv_pru_get_control_addr( unsigned int prunum ){
+  unsigned int *prucontrolregs;
+  
+  if (prunum == 0)
+    prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
+  else if (prunum == 1)
+    prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
+  else
+    return 0;
+  
+  return prucontrolregs;
+}
+
+unsigned int *prussdrv_pru_get_debug_addr( unsigned int prunum ){
+  unsigned int *prudebugregs;
+  
+  if (prunum == 0)
+    prudebugregs = (unsigned int *) prussdrv.pru0_debug_base;
+  else if (prunum == 1)
+    prudebugregs = (unsigned int *) prussdrv.pru1_debug_base;
+  else
+    return 0;
+  
+  return prudebugregs;
+}
+
 unsigned int prussdrv_pru_set_control(unsigned int prunum, unsigned int newVal)
 {
     unsigned int *prucontrolregs;
@@ -670,19 +696,23 @@ int prussdrv_exit()
 
 
 int prussdrv_exec_program(int prunum, const char *filename) {
-  return prussdrv_load_program(prunum, filename );
+  if( prussdrv_load_program(prunum, filename ) ) return -1;
+  return prussdrv_pru_enable_at(prunum, 0);
 }
 
 int prussdrv_exec_program_at(int prunum, const char *filename, size_t addr){
-  return prussdrv_load_program_at( prunum, filename, addr );
+  if (prussdrv_load_program_at( prunum, filename, addr ) ) return -1;
+  return prussdrv_pru_enable_at(prunum, addr);
 }
 
 int prussdrv_exec_code(int prunum, const unsigned int *code, int codelen){
-  return prussdrv_load_code( prunum, code, codelen );
+  if ( prussdrv_load_code( prunum, code, codelen ) ) return -1;  
+  return prussdrv_pru_enable_at(prunum, 0);
 }
 
 int prussdrv_exec_code_at(int prunum, const unsigned int *code, int codelen, size_t addr){
-  return prussdrv_exec_code_at(prunum, code, codelen, addr );
+  if(  prussdrv_load_code_at(prunum, code, codelen, addr ) ) return -1;  
+  return prussdrv_pru_enable_at(prunum, addr);
 }
 
 
@@ -749,7 +779,6 @@ int prussdrv_load_code_at(int prunum, const unsigned int *code, int codelen, siz
     // Make sure PRU sub system is first disabled/reset
     prussdrv_pru_disable(prunum);
     prussdrv_pru_write_memory(pru_ram_id, 0, code, codelen);
-    prussdrv_pru_enable_at(prunum, addr);
 
     return 0;
 }
