@@ -288,17 +288,32 @@ int prussdrv_pru_reset(unsigned int prunum)
 
 unsigned int prussdrv_pru_get_control(unsigned int prunum, unsigned int *oldVal)
 {
-    unsigned int *prucontrolregs;
+  volatile unsigned int *prucontrolregs;
 
-    if (prunum == 0)
-        prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
-    else if (prunum == 1)
-        prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
-    else
-        return -1;
-    *oldVal = *prucontrolregs;
+  if (prunum == 0)
+    prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
+  else if (prunum == 1)
+    prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
+  else
+    return -1;
+  *oldVal = *prucontrolregs;
+  
+  return 0;
+}
 
-    return 0;
+unsigned int prussdrv_pru_set_control(unsigned int prunum, unsigned int newVal)
+{
+  volatile unsigned int *prucontrolregs;
+
+  if (prunum == 0)
+    prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
+  else if (prunum == 1)
+    prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
+  else
+    return -1;
+  
+  *prucontrolregs = newVal;
+  return 0;
 }
 
 unsigned int *prussdrv_pru_get_control_addr( unsigned int prunum ){
@@ -325,21 +340,6 @@ unsigned int *prussdrv_pru_get_debug_addr( unsigned int prunum ){
     return 0;
   
   return prudebugregs;
-}
-
-unsigned int prussdrv_pru_set_control(unsigned int prunum, unsigned int newVal)
-{
-    unsigned int *prucontrolregs;
-
-    if (prunum == 0)
-        prucontrolregs = (unsigned int *) prussdrv.pru0_control_base;
-    else if (prunum == 1)
-        prucontrolregs = (unsigned int *) prussdrv.pru1_control_base;
-    else
-        return -1;
-
-    *prucontrolregs = newVal;
-    return 0;
 }
 
 int prussdrv_pru_enable(unsigned int prunum)
