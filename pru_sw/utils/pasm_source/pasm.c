@@ -1256,7 +1256,7 @@ static int ValidateOffset( SOURCEFILE *ps )
 */
 static int PrintLine( FILE *pfOut, SOURCEFILE *ps )
 {
-    int i;
+    size_t i;
     char c;
 
 AGAIN:

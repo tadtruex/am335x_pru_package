@@ -220,7 +220,7 @@ NO_MATCH:
         if( TermCnt != 2 )
             { Report(ps,REP_ERROR,"Expected 1 operand"); return(-1); }
         sprintf( Src, ".%s:", pTerms[1] );
-        return(strlen(Src));
+        return((int)strlen(Src));
     }
     else if( i==DOTCMD_RET )
     {
@@ -239,7 +239,7 @@ NO_MATCH:
         if( Core > CORE_V1 )
             { Report(ps,REP_ERROR,".ret illegal with specified core version, use ret"); return(-1); }
         strcpy( Src, "jmp     r30.w0" );
-        return(strlen(Src));
+        return((int)strlen(Src));
     }
     else if( i==DOTCMD_ORIGIN )
     {

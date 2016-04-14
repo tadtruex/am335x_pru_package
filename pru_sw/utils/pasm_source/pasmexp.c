@@ -111,7 +111,7 @@ int Expression( SOURCEFILE *ps, char *s, uint *pResult, int *pIndex )
     uint    values[MAXTERM];
     uint    ops[MAXTERM];
     int     maxprec;
-    int     i;
+    int     i=0;
     int     validx,opidx,stridx;
 
     validx=0;

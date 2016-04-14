@@ -298,7 +298,7 @@ SUBTEXTDONE:
                 nidx = 0;
             }
             /* Check for text too long */
-            i=strlen(src);
+            i=(int)strlen(src);
             if( i==(MAX_SOURCE_LINE-1) )
                 { Report(ps,REP_ERROR,"Macro expansion too long"); pm->InUse=0; return(0); }
             src[i++]=c;
@@ -307,7 +307,7 @@ SUBTEXTDONE:
                 break;
         }
 
-        i=strlen(src);
+        i=(int)strlen(src);
         if(i)
         {
             if( !ProcessSourceLine(ps, i, src, MAX_SOURCE_LINE) )
