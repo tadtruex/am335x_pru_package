@@ -501,7 +501,7 @@ int CheckEquate( char *name )
 */
 static int ReadCharacter( SOURCEFILE *ps )
 {
-    int i;
+    size_t i;
     char c;
 
 AGAIN:
@@ -790,7 +790,7 @@ static int LoadInclude( SOURCEFILE *ps, char *Src )
     {
         term = '"';
         strcpy( NewFileName, ps->SourceBaseDir );
-        idx = strlen(NewFileName);
+        idx = (int)strlen(NewFileName);
         NewFileName[idx++] = '/';
         NewFileName[idx] = '\0';
     }
